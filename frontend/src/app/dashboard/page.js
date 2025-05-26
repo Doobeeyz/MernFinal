@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
+import AvatarUpload from '../../components/AvatarUpload';
 
 export default function DashboardPage() {
   const { user, logout, isAuthenticated, loading } = useAuth();
@@ -17,6 +18,11 @@ export default function DashboardPage() {
   const handleLogout = () => {
     logout();
     router.push('/login');
+  };
+
+  const handleAvatarUpload = (url) => {
+    console.log("Avatar uploaded successfully:", url);
+    // Можно добавить дополнительную логику обработки
   };
 
   if (loading) {
@@ -63,15 +69,27 @@ export default function DashboardPage() {
               <h2 className="text-2xl font-bold text-gray-900 mb-4">
                 Добро пожаловать в панель управления!
               </h2>
-              <div className="bg-white shadow rounded-lg p-6 max-w-md mx-auto">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">
-                  Информация о пользователе
-                </h3>
-                <div className="space-y-2 text-left">
-                  <p><strong>Имя:</strong> {user?.name}</p>
-                  <p><strong>Email:</strong> {user?.email}</p>
-                  <p><strong>ID:</strong> {user?._id}</p>
-                  <p><strong>Дата регистрации:</strong> {new Date(user?.createdAt).toLocaleDateString('ru-RU')}</p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                {/* Информация о пользователе */}
+                <div className="bg-white shadow rounded-lg p-6">
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">
+                    Информация о пользователе
+                  </h3>
+                  <div className="space-y-2 text-left">
+                    <p><strong>Имя:</strong> {user?.name}</p>
+                    <p><strong>Email:</strong> {user?.email}</p>
+                    <p><strong>ID:</strong> {user?._id}</p>
+                    <p><strong>Дата регистрации:</strong> {new Date(user?.createdAt).toLocaleDateString('ru-RU')}</p>
+                  </div>
+                </div>
+
+                {/* Загрузка аватара */}
+                <div className="bg-white shadow rounded-lg p-6">
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">
+                    Аватар
+                  </h3>
+                  <AvatarUpload onUploadComplete={handleAvatarUpload} />
                 </div>
               </div>
             </div>
@@ -81,4 +99,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-

@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const authRoutes = require('./routes/auth');
+const uploadthingRoutes = require('./routes/uploadthing');
 
 dotenv.config();
 
@@ -32,6 +33,7 @@ mongoose.connection.on('error', (err) => {
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/uploadthing', uploadthingRoutes); // Добавьте эту строку
 
 app.get('/', (req, res) => {
   res.json({ message: 'Auth API Server is running!' });
