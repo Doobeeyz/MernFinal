@@ -22,7 +22,7 @@ export default function Navigation() {
   return (
     <nav className="bg-[#fff8e1] border-b-2 border-[#ffcc00] px-8 py-4 shadow-md">
       <div className="max-w-screen-xl mx-auto flex justify-between items-center">
-        <Link href="/" className="text-xl font-bold text-[#e53935] hover:underline">
+        <Link href="/" className="text-4xl font-bold text-[#e53935]">
           Movie App
         </Link>
 
