@@ -7,11 +7,13 @@ const f = createUploadthing();
 export const ourFileRouter = {
   avatarUploader: f({
     image: { maxFileSize: "2MB", maxFileCount: 1 },
-  })
-    .onUploadComplete(async ({ file, metadata }) => {
-      // тут ты можешь обработать файл, если нужно
-      console.log("Upload complete", file.url);
-    }),
-} satisfies FileRouter;
+  }).onUploadComplete(async ({ file }) => {
+    console.log("Avatar uploaded:", file.url);
+  }),
 
-export type OurFileRouter = typeof ourFileRouter;
+  posterUploader: f({
+    image: { maxFileSize: "5MB", maxFileCount: 1 },
+  }).onUploadComplete(async ({ file }) => {
+    console.log("Poster uploaded:", file.url);
+  }),
+} satisfies FileRouter;
