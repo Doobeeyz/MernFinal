@@ -27,4 +27,16 @@ router.get("/all", async (req, res) => {
   res.json(movies);
 });
 
+router.get('/:id', async (req, res) => {
+  try {
+    const movie = await Movie.findById(req.params.id);
+    if (!movie) {
+      return res.status(404).json({ message: 'Фильм не найден' });
+    }
+    res.json(movie.toObject());
+  } catch (error) {
+    res.status(500).json({ message: 'Ошибка при получении фильма', error: error.message });
+  }
+});
+
 export default router;

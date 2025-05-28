@@ -4,11 +4,24 @@ import { UploadButton } from '@uploadthing/react';
 import { useState } from 'react';
 import axios from 'axios';
 
+function convertToEmbedLink(link: string): string {
+  const idx = link.indexOf("&");
+  if (idx !== -1) {
+    link = link.substring(0, idx);
+  }
+
+  link = link.replace("watch?v=", "embed/");
+
+  return link;
+}
+
+
 export default function AddMoviePage() {
   const [title, setTitle] = useState('');
   const [trailerUrl, setTrailerUrl] = useState('');
   const [posterUrl, setPosterUrl] = useState('');
   const [director, setDirector] = useState('');
+  const [description, setDescription] = useState('')
   const [releaseDate, setReleaseDate] = useState('');
   const [message, setMessage] = useState('');
 
@@ -24,6 +37,7 @@ export default function AddMoviePage() {
           trailerUrl,
           posterUrl,
           director,
+          description,
           releaseDate,
         },
         {
@@ -38,6 +52,7 @@ export default function AddMoviePage() {
       setTrailerUrl('');
       setPosterUrl('');
       setDirector('');
+      setDescription('');
       setReleaseDate('');
     } catch (err) {
       console.error(err);
@@ -75,7 +90,7 @@ export default function AddMoviePage() {
           <input
             type="text"
             value={trailerUrl}
-            onChange={(e) => setTrailerUrl(e.target.value)}
+            onChange={(e) => setTrailerUrl(convertToEmbedLink(e.target.value))}
             className="w-[93%] p-2 border-2 border-[#ffcc00] rounded bg-[#fff8e1] text-sm text-gray-800"
           />
         </div>
@@ -86,6 +101,16 @@ export default function AddMoviePage() {
             type="text"
             value={director}
             onChange={(e) => setDirector(e.target.value)}
+            className="w-[93%] p-2 border-2 border-[#ffcc00] rounded bg-[#fff8e1] text-sm text-gray-800"
+          />
+        </div>
+
+        <div className="mb-2">
+          <label className="block text-[#333] font-bold mb-1">Описание:</label>
+          <input
+            type="text"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
             className="w-[93%] p-2 border-2 border-[#ffcc00] rounded bg-[#fff8e1] text-sm text-gray-800"
           />
         </div>
