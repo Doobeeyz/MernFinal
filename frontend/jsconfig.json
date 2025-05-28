@@ -1,7 +1,14 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",                // позволяет использовать alias '@/'
     "paths": {
-      "@/*": ["./src/*"]
-    }
-  }
+      "@/*": ["app/*"]
+    },
+    "jsx": "preserve",             // ключевая строка для поддержки JSX
+    "module": "esnext",
+    "moduleResolution": "node",
+    "allowJs": true
+  },
+  "include": ["next-env.d.ts", "**/*.js", "**/*.jsx", "**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"]
 }
