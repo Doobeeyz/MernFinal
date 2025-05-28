@@ -1,44 +1,39 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const dotenv = require('dotenv');
-const authRoutes = require('./routes/auth');
-const uploadthingRoutes = require('./routes/uploadthing');
+import express from "express";
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import cors from "cors";
+import http from "http";
+import { Server } from "socket.io";
+
+import authRoutes from "./routes/auth.js";
+import movieRoutes from "./routes/movie.js";
+import userRoutes from "./routes/user.js";
 
 dotenv.config();
-
 const app = express();
-const PORT = process.env.PORT || 3001;
+const server = http.createServer(app);
+const io = new Server(server, { cors: { origin: "*" } });
 
 // Middleware
-app.use(cors({
-  origin: 'http://localhost:3000',
-  credentials: true
-}));
+app.use(cors());
 app.use(express.json());
 
-// MongoDB connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/authapp', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-
-mongoose.connection.on('connected', () => {
-  console.log('Connected to MongoDB');
-});
-
-mongoose.connection.on('error', (err) => {
-  console.error('MongoDB connection error:', err);
-});
-
 // Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/uploadthing', uploadthingRoutes); // Добавьте эту строку
+app.use("/api/auth", authRoutes);
+app.use("/api/movies", movieRoutes);
+app.use("/api/user", userRoutes);
 
-app.get('/', (req, res) => {
-  res.json({ message: 'Auth API Server is running!' });
+// WebSocket
+io.on("connection", (socket) => {
+  console.log("User connected:", socket.id);
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+// MongoDB Connection
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log("MongoDB connected");
+    server.listen(process.env.PORT, () =>
+      console.log(`Server running on port ${process.env.PORT}`)
+    );
+  })
+  .catch((err) => console.log(err));
