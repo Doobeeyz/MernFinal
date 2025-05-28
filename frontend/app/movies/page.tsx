@@ -59,7 +59,7 @@ export default function MoviesPage() {
                   />
                 )}
                 <h2 className="text-xl font-semibold text-[#e53935] mb-2">{movie.title} ({new Date(getReleaseDate(movie)).getFullYear()})</h2>
-                <p className="text-sm text-gray-700 h-16 overflow-hidden overflow-ellipsis">{movie.description}</p>
+                <p className="text-sm text-gray-700 line-clamp-3">{movie.description}</p>
               </div>
             </Link>
           );
