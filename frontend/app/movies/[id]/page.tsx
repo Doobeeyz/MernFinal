@@ -1,12 +1,13 @@
-// frontend/app/movies/[id]/page.tsx
 'use client';
 
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import axios from 'axios';
 import Link from 'next/link';
+import { io } from 'socket.io-client';
+import ReviewForm from '../../../components/ReviewForm';
+import ReviewList from '../../../components/ReviewList';
 
-// Определяем типы для MongoDB объектов
 type MongoId = string | { $oid: string };
 type MongoDate = string | { $date: string };
 
@@ -21,20 +22,48 @@ type Movie = {
   rating?: number;
 };
 
+type Review = {
+  _id: string;
+  userId: {
+    _id: string;
+    username: string;
+    avatarUrl?: string;
+  };
+  movieId: string;
+  rating: number;
+  text: string;
+  isSuperUser: boolean;
+  createdAt: string;
+};
+
 export default function MovieDetailPage() {
   const params = useParams();
   const router = useRouter();
   const [movie, setMovie] = useState<Movie | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([])
+  const [currentUser, setCurrentUser] = useState<{id: string} | null>(null)
+  const [socket, setSocket] = useState<any>(null)
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const newSocket = io('http://localhost:3001');
+    setSocket(newSocket);
+
+    return () => {newSocket.close();}
+  }, []);
+
+  useEffect(() => {
     if (params.id) {
-      axios
-        .get(`http://localhost:3001/api/movies/${params.id}`)
-        .then((res) => {
-          console.log('Полученные данные:', res.data); // Для отладки
-          setMovie(res.data);
+      Promise.all([
+        axios.get(`http://localhost:3001/api/movies/${params.id}`),
+        axios.get(`http://localhost:3001/api/reviews/movie/${params.id}`),
+        getCurrentUser()
+      ])
+        .then(([movieRes, reviewRes, user]) => {
+          setMovie(movieRes.data);
+          setReviews(reviewRes.data);
+          setCurrentUser(user)
           setLoading(false);
         })
         .catch((err) => {
@@ -45,7 +74,67 @@ export default function MovieDetailPage() {
     }
   }, [params.id]);
 
-  // Безопасная функция для получения даты
+  useEffect(() => {
+    if (socket && params.id) {
+      socket.emit('joinMovie', params.id);
+
+      socket.on('newReview', (data) => {
+        if (data.movieId === params.id) {
+          setReviews(prev => [data.review, ...prev]);
+
+          updateMovieRating();
+        }
+      });
+
+      socket.on('reviewDeleted', (data) => {
+        if (data.movieId === params.id) {
+          setReviews(prev => prev.filter(review => review._id !== data.reviewId));
+
+          updateMovieRating();
+        }
+      });
+
+      return () => {
+        socket.emit('leaveMovie', params.id);
+        socket.off('newReview');
+        socket.off('reviewDeleted');
+      };
+    }
+  }, [socket, params.id]);
+
+  const updateMovieRating = async () => {
+    try {
+      const res = await axios.get(`http://localhost:3001/api/movies/${params.id}`);
+      setMovie(prev => prev ? { ...prev, rating: res.data.rating } : null);
+    } catch (err) {
+      console.error('Ошибка при обновлении рейтинга:', err);
+    }
+  }
+
+  const handleReviewAdded = () => {
+    console.log('Отзыв добавлен');
+  };
+
+  const handleReviewDeleted = (reviewId) => {
+    console.log('Отзыв удален:', reviewId);
+  };
+
+  const getCurrentUser = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return null;
+
+      const res = await axios.get('http://localhost:3001/api/user/me', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      return { id: res.data._id };
+    } catch (err) {
+      return null;
+    }
+  };
+
   const getReleaseDate = (date?: MongoDate): string | null => {
     if (!date) return null;
     
@@ -60,7 +149,6 @@ export default function MovieDetailPage() {
     return null;
   };
 
-  // Безопасная функция для форматирования даты
   const formatDate = (date?: MongoDate): string => {
     const dateString = getReleaseDate(date);
     if (!dateString) return 'Дата не указана';
@@ -166,6 +254,20 @@ export default function MovieDetailPage() {
                     ></iframe>
                 </div></div>
             )}
+          </div>
+            <div className="max-w-4xl mx-auto">
+            {currentUser && (
+              <ReviewForm 
+                movieId={params.id as string}
+                onReviewAdded={handleReviewAdded}
+              />
+            )}
+
+            <ReviewList 
+              reviews={reviews}
+              currentUserId={currentUser?.id}
+              onReviewDeleted={handleReviewDeleted}
+            />
           </div>
       </div>
     </div>
