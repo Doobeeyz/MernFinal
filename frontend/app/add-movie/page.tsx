@@ -1,8 +1,9 @@
 'use client';
 
 import { UploadButton } from '@uploadthing/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
 
 function convertToEmbedLink(link: string): string {
   const idx = link.indexOf("&");
@@ -15,20 +16,35 @@ function convertToEmbedLink(link: string): string {
   return link;
 }
 
-
 export default function AddMoviePage() {
   const [title, setTitle] = useState('');
   const [trailerUrl, setTrailerUrl] = useState('');
   const [posterUrl, setPosterUrl] = useState('');
   const [director, setDirector] = useState('');
-  const [description, setDescription] = useState('')
+  const [description, setDescription] = useState('');
   const [releaseDate, setReleaseDate] = useState('');
+  const [actors, setActors] = useState([]);
+  const [selectedActors, setSelectedActors] = useState([]);
   const [message, setMessage] = useState('');
+  const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  useEffect(() => {
+    const fetchActors = async () => {
+      try {
+        const response = await axios.get('http://localhost:3001/api/actors/all');
+        setActors(response.data);
+      } catch (err) {
+        console.error('Ошибка при получении актёров:', err);
+      }
+    };
+
+    fetchActors();
+  }, []);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('accessToken');
 
       await axios.post(
         'http://localhost:3001/api/movies/add',
@@ -39,6 +55,7 @@ export default function AddMoviePage() {
           director,
           description,
           releaseDate,
+          actors: selectedActors, // Добавляем выбранных актёров
         },
         {
           headers: {
@@ -54,6 +71,8 @@ export default function AddMoviePage() {
       setDirector('');
       setDescription('');
       setReleaseDate('');
+      setSelectedActors([]); // Сбрасываем выбранных актёров
+      router.push('/movies'); // Перенаправление на страницу фильмов
     } catch (err) {
       console.error(err);
       setMessage('Ошибка при добавлении фильма');
@@ -123,6 +142,25 @@ export default function AddMoviePage() {
             onChange={(e) => setReleaseDate(e.target.value)}
             className="w-[93%] p-2 border-2 border-[#ffcc00] rounded bg-[#fff8e1] text-sm text-gray-800"
           />
+        </div>
+
+        <div className="mb-2">
+          <label className="block text-[#333] font-bold mb-1">Актёры:</label>
+          <select
+            multiple
+            value={selectedActors}
+            onChange={(e) => {
+              const options = Array.from(e.target.selectedOptions, option => option.value);
+              setSelectedActors(options);
+            }}
+            className="w-[93%] p-2 border-2 border-[#ffcc00] rounded bg-[#fff8e1] text-sm text-gray-800"
+          >
+            {actors.map(actor => (
+              <option key={actor._id} value={actor._id}>
+                {actor.name}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div className="mb-2">

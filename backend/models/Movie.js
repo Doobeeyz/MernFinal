@@ -7,10 +7,11 @@ const movieSchema = new mongoose.Schema({
   description: String,
   trailerUrl: String,
   posterUrl: String,
-  rating:{
+  rating: {
     type: Number,
     default: 0,
   },
+  actors: [{ type: mongoose.Schema.Types.ObjectId, ref: "Actor" }], 
 });
 
 export default mongoose.model("Movie", movieSchema);

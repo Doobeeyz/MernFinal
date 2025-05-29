@@ -45,9 +45,24 @@ const handleLogout = () => {
               <Link
                 href="/profile"
                 className="bg-[#e53935] text-white font-medium rounded-md px-4 py-2 hover:bg-[#d32f2f] transition-colors"
-              >
+              > 
                 Профиль
               </Link>
+
+              <Link
+                href="/actors"
+                className="bg-[#e53935] text-white font-medium rounded-md px-4 py-2 hover:bg-[#d32f2f] transition-colors"
+              >
+              Актёры
+              </Link>
+
+              <Link
+              href="/actors/add"
+              className="bg-[#e53935] text-white font-medium rounded-md px-4 py-2 hover:bg-[#d32f2f] transition-colors"
+              >
+              Добавить актёра
+              </Link>
+
               <button
                 onClick={handleLogout}
                 className="bg-[#e53935] text-white font-medium rounded-md px-4 py-2 hover:bg-[#d32f2f] transition-colors"

@@ -9,6 +9,7 @@ import authRoutes from "./routes/auth.js";
 import movieRoutes from "./routes/movie.js";
 import userRoutes from "./routes/user.js";
 import reviewRouter from "./routes/review.js"
+import actorRoutes from "./routes/actorRoutes.js";
 
 dotenv.config();
 const app = express();
@@ -31,6 +32,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/movies", movieRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/reviews", reviewRouter)
+app.use("/api/actors", actorRoutes);
 
 // WebSocket
 io.on("connection", (socket) => {

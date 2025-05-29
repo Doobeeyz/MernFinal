@@ -10,6 +10,13 @@ import ReviewList from '../../../components/ReviewList';
 
 type MongoId = string | { $oid: string };
 type MongoDate = string | { $date: string };
+const getKey = (id: MongoId): string => {
+  if (typeof id === 'string') return id;
+  if (id && typeof id === 'object' && '$oid' in id && typeof id.$oid === 'string') return id.$oid;
+  return '';
+};
+
+
 
 type Movie = {
   _id: MongoId;
@@ -20,6 +27,7 @@ type Movie = {
   releaseDate?: MongoDate;
   description?: string;
   rating?: number;
+  actors?: { _id: MongoId; name: string; photoUrl?: string }[];
 };
 
 type Review = {
@@ -122,7 +130,6 @@ export default function MovieDetailPage() {
   const getCurrentUser = async () => {
     try {
       const token = localStorage.getItem('accessToken');
-
       if (!token) return null;
 
       const res = await axios.get('http://localhost:3001/api/user/me', {
@@ -238,6 +245,31 @@ export default function MovieDetailPage() {
             </div>
             
         </div>
+              <div className="mt-8">
+          <h2 className="text-xl font-semibold mb-2">Актёры</h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {movie.actors && movie.actors.length > 0 ? (
+  movie.actors.map((actor) => (
+    <div key={getKey(actor._id)} className="bg-gray-100 p-4 rounded-lg shadow">
+    <Link href={`/actors/${getKey(actor._id)}`}>
+
+
+        <img
+          src={actor.photoUrl || '/default-avatar.png'} 
+          alt={actor.name}
+          className="w-full h-32 object-cover rounded mb-2"
+        />
+        <h3 className="text-lg font-semibold text-center">{actor.name}</h3>
+      </Link>
+    </div>
+  ))
+) : (
+  <p className="text-gray-500">Нет актёров в этом фильме.</p>
+)}
+
+          </div>
+        </div>
+</div>
         {movie.trailerUrl && (
             <div>
                 <h2 className="text-2xl font-semibold text-center mt-6">Трейлер</h2>
@@ -263,6 +295,7 @@ export default function MovieDetailPage() {
                 onReviewAdded={handleReviewAdded}
               />
             )}
+            
 
             <ReviewList 
               reviews={reviews}
@@ -271,6 +304,6 @@ export default function MovieDetailPage() {
             />
           </div>
       </div>
-    </div>
+    
   );
 }
