@@ -25,6 +25,7 @@ router.post("/", authMiddleware, async (req, res) => {
   try {
     const { movieId, rating, text } = req.body;
     const userId = req.user.id;
+    const superUser = req.user.superUser
 
     const movie = await Movie.findById(movieId);
     if (!movie) {
@@ -41,7 +42,7 @@ router.post("/", authMiddleware, async (req, res) => {
       movieId,
       rating,
       text,
-      isSuperUser,
+      isSuperUser:superUser ?? false
     });
 
     await review.save();

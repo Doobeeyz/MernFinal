@@ -121,7 +121,8 @@ export default function MovieDetailPage() {
 
   const getCurrentUser = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('accessToken');
+
       if (!token) return null;
 
       const res = await axios.get('http://localhost:3001/api/user/me', {

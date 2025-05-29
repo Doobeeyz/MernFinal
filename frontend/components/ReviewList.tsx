@@ -7,7 +7,8 @@ export default function ReviewList({ reviews, currentUserId, onReviewDeleted }) 
   const [deletingIds, setDeletingIds] = useState(new Set());
 
   const handleDelete = async (reviewId) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken');
+
     if (!token) return;
 
     if (!confirm('Вы уверены, что хотите удалить этот отзыв?')) {

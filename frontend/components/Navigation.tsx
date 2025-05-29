@@ -8,16 +8,17 @@ export default function Navigation() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    setIsLoggedIn(!!token);
-  }, []);
+useEffect(() => {
+  const token = localStorage.getItem('accessToken');
+  setIsLoggedIn(!!token);
+}, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    setIsLoggedIn(false);
-    router.push('/login');
-  };
+const handleLogout = () => {
+  localStorage.removeItem('accessToken');
+  setIsLoggedIn(false);
+  router.push('/login');
+};
+
 
   return (
     <nav className="bg-[#fff8e1] border-b-2 border-[#ffcc00] px-8 py-4 shadow-md">

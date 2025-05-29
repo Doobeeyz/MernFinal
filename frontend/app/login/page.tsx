@@ -23,7 +23,9 @@ export default function Login() {
         password,
       });
 
-      localStorage.setItem('token', res.data.token);
+      localStorage.setItem("accessToken", res.data.accessToken);
+      localStorage.setItem("refreshToken", res.data.refreshToken);
+
       router.push('/profile');
       window.location.reload();
     } catch (err: any) {

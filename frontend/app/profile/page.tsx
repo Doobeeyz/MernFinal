@@ -20,56 +20,61 @@ export default function Profile() {
 
 
   useEffect(() => {
-    
-    const fetchUser = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          router.push('/login');
-          return;
-        }
-
-        const res = await axios.get('http://localhost:3001/api/user/me', {
-          
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setUser(res.data);
-      } catch (err) {
-        console.error(err);
-        localStorage.removeItem('token');
-        router.push('/login');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUser();
-  }, [router]);
-
-  
-
-  const handleAvatarUpload = async (uploadedUrl: string) => {
-    setUploading(true);
+  const fetchUser = async () => {
     try {
-      await axios.patch(
-        'http://localhost:3001/api/user/avatar',
-        { avatarUrl: uploadedUrl },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
-        }
-      );
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        router.push('/login');
+        return;
+      }
 
-      setUser(prev => prev ? { ...prev, avatarUrl: uploadedUrl } : null);
+      const res = await axios.get('http://localhost:3001/api/user/me', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Cache-Control': 'no-cache', // <--- добавьте это!
+        }
+      });
+
+      // Если res.data пустой, не сбрасывайте пользователя
+      if (!res.data || Object.keys(res.data).length === 0) {
+        throw new Error('Пустой ответ');
+      }
+
+      setUser(res.data);
     } catch (err) {
-      console.error('Ошибка при обновлении аватара:', err);
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      router.push('/login');
     } finally {
-      setUploading(false);
+      setLoading(false);
     }
   };
+
+  fetchUser();
+}, [router]);
+
+
+const handleAvatarUpload = async (uploadedUrl: string) => {
+  setUploading(true);
+  try {
+    await axios.patch(
+      'http://localhost:3001/api/user/avatar',
+      { avatarUrl: uploadedUrl },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`, // исправлено!
+        },
+      }
+    );
+
+    setUser(prev => prev ? { ...prev, avatarUrl: uploadedUrl } : null);
+  } catch (err) {
+    console.error('Ошибка при обновлении аватара:', err);
+  } finally {
+    setUploading(false);
+  }
+};
+
 
   if (loading) {
     return (
