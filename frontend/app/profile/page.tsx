@@ -18,6 +18,10 @@ export default function Profile() {
   const [uploading, setUploading] = useState(false);
   const router = useRouter();
 
+  const [editMode, setEditMode] = useState(false);
+  const [form, setForm] = useState({ username: '', email: '' });
+  const [saving, setSaving] = useState(false);
+
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -53,6 +57,34 @@ export default function Profile() {
     fetchUser();
   }, [router]);
 
+
+    useEffect(() => {
+    if (user) {
+      setForm({ username: user.username, email: user.email });
+    }
+  }, [user]);
+  const handleEdit = () => setEditMode(true);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const token = localStorage.getItem('accessToken');
+      const res = await axios.patch(
+        'http://localhost:3001/api/user/me',
+        { username: form.username, email: form.email },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setUser(res.data);
+      setEditMode(false);
+    } catch (err) {
+      alert('Ошибка при сохранении профиля');
+    } finally {
+      setSaving(false);
+    }
+  };
+  
 
 const handleAvatarUpload = async (uploadedUrl: string) => {
   setUploading(true);
@@ -111,7 +143,7 @@ const handleAvatarUpload = async (uploadedUrl: string) => {
             </div>
           )}
 
-          {/* Upload */}
+         
           <div className="text-center">
             <UploadButton
               endpoint="avatarUploader"
@@ -138,24 +170,76 @@ const handleAvatarUpload = async (uploadedUrl: string) => {
             )}
           </div>
 
-          {/* User Info */}
-          <div className="w-full">
-            <div className="mb-4">
-              <label className="block text-sm font-bold text-[#e53935] mb-1">Имя пользователя</label>
-              <p className="text-[#333] border-2 border-[#ffcc00] bg-[#fff8e1] px-3 py-2 rounded-md text-sm">
-                {user.username}
-              </p>
-            </div>
-
-            <div>
-              <label className="block text-sm font-bold text-[#e53935] mb-1">Email</label>
-              <p className="text-[#333] border-2 border-[#ffcc00] bg-[#fff8e1] px-3 py-2 rounded-md text-sm">
-                {user.email}
-              </p>
-            </div>
+          
+          <div className="w-full flex gap-2 pt-4">
+            {editMode ? (
+              <>
+                <button
+                  onClick={handleSave}
+                  className="flex-1 bg-[#e53935] hover:bg-[#b71c1c] text-white font-semibold py-2 rounded-md transition-colors"
+                  disabled={saving}
+                >
+                  {saving ? 'Сохраняем...' : 'Сохранить'}
+                </button>
+                <button
+                  onClick={() => { setEditMode(false); setForm({ username: user.username, email: user.email }); }}
+                  className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 rounded-md transition-colors"
+                  disabled={saving}
+                >
+                  Отмена
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={handleEdit}
+                className="w-full bg-[#f0b100] hover:bg-[#ffcc00] text-white font-semibold py-2 rounded-md transition-colors"
+              >
+                Редактировать профиль
+              </button>
+            )}
           </div>
 
-          {/* Кнопка "Добавить фильм" */}
+         
+          <div className="w-full">
+  <div className="mb-4">
+    <label className="block text-sm font-bold text-[#e53935] mb-1">Имя пользователя</label>
+    {editMode ? (
+      <input
+        type="text"
+        name="username"
+        value={form.username}
+        onChange={handleChange}
+        className="text-[#333] border-2 border-[#ffcc00] bg-[#fff8e1] px-3 py-2 rounded-md text-sm w-full"
+        disabled={saving}
+      />
+    ) : (
+      <p className="text-[#333] border-2 border-[#ffcc00] bg-[#fff8e1] px-3 py-2 rounded-md text-sm">
+        {user.username}
+      </p>
+    )}
+  </div>
+
+  <div>
+    <label className="block text-sm font-bold text-[#e53935] mb-1">Email</label>
+    {editMode ? (
+      <input
+        type="email"
+        name="email"
+        value={form.email}
+        onChange={handleChange}
+        className="text-[#333] border-2 border-[#ffcc00] bg-[#fff8e1] px-3 py-2 rounded-md text-sm w-full"
+        disabled={saving}
+      />
+    ) : (
+      <p className="text-[#333] border-2 border-[#ffcc00] bg-[#fff8e1] px-3 py-2 rounded-md text-sm">
+        {user.email}
+      </p>
+    )}
+  </div>
+</div>
+
+
+        
           <div className="w-full pt-4">
             <Link
               href="/add-movie"

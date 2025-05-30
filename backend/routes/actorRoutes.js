@@ -4,20 +4,19 @@ import auth from "../middleware/auth.js";
 
 const router = express.Router();
 
-// Добавление актёра
+
 router.post("/add", auth, async (req, res) => {
   const actor = new Actor(req.body);
   await actor.save();
   res.status(201).json({ message: "Актёр добавлен" });
 });
 
-// Получение всех актёров
+
 router.get("/all", async (req, res) => {
   const actors = await Actor.find();
   res.json(actors);
 });
 
-// Получение актёра по ID
    router.get("/:id", async (req, res) => {
      try {
        const actor = await Actor.findById(req.params.id);

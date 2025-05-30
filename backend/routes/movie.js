@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import Movie from "../models/Movie.js";
 
 const router = express.Router();
-// Middleware to verify JWT
+
 function auth(req, res, next) {
   const token = req.headers.authorization?.split(" ")[1];
   if (!token) return res.status(403).json({ message: "Token missing" });

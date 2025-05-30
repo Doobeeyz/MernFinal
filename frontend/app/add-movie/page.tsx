@@ -55,7 +55,7 @@ export default function AddMoviePage() {
           director,
           description,
           releaseDate,
-          actors: selectedActors, // Добавляем выбранных актёров
+          actors: selectedActors, 
         },
         {
           headers: {
@@ -71,8 +71,8 @@ export default function AddMoviePage() {
       setDirector('');
       setDescription('');
       setReleaseDate('');
-      setSelectedActors([]); // Сбрасываем выбранных актёров
-      router.push('/movies'); // Перенаправление на страницу фильмов
+      setSelectedActors([]); 
+      router.push('/movies'); 
     } catch (err) {
       console.error(err);
       setMessage('Ошибка при добавлении фильма');

@@ -21,20 +21,20 @@ const io = new Server(server, {
   } 
 });
 
-// Middleware
+//middleware
 app.use(cors());
 app.use(express.json());
 
 app.set('io', io);
 
-// Routes
+//routes
 app.use("/api/auth", authRoutes);
 app.use("/api/movies", movieRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/reviews", reviewRouter)
 app.use("/api/actors", actorRoutes);
 
-// WebSocket
+//webSocket
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
 
@@ -53,7 +53,7 @@ io.on("connection", (socket) => {
   })
 });
 
-// MongoDB Connection
+
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log("MongoDB connected");

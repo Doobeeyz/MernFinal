@@ -1,4 +1,4 @@
-// frontend/app/movies/page.tsx
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -25,7 +25,7 @@ export default function MoviesPage() {
       .catch((err) => console.error('Ошибка при получении фильмов:', err));
   }, []);
 
-  // Функция для получения ID
+ 
   const getMovieId = (movie: Movie): string => {
     if (typeof movie._id === 'string') {
       return movie._id;
@@ -33,7 +33,7 @@ export default function MoviesPage() {
     return movie._id.$oid;
   };
 
-  // Функция для получения даты
+
   const getReleaseDate = (movie: Movie): string => {
     if (typeof movie.releaseDate === 'string') {
       return movie.releaseDate;
