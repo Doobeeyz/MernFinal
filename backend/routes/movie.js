@@ -20,13 +20,18 @@ router.post("/add", auth, async (req, res) => {
 });
 
 router.get("/all", async (req, res) => {
-  const movies = await Movie.find();
-  res.json(movies);
+  try {
+    const movies = await Movie.find().populate('actors', 'name bio photoUrl');
+    res.json(movies);
+  } catch (error) {
+    console.error('Ошибка при получении фильмов:', error);
+    res.status(500).json({ message: 'Ошибка при получении фильмов', error: error.message });
+  }
 });
 
 router.get('/:id', async (req, res) => {
   try {
-    const movie = await Movie.findById(req.params.id);
+    const movie = await Movie.findById(req.params.id).populate('actors', 'name bio photoUrl');;
     if (!movie) {
       return res.status(404).json({ message: 'Фильм не найден' });
     }

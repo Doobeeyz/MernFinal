@@ -77,6 +77,15 @@ export default function AddActorPage() {
      onUploadError={(error) => {
        alert(`Ошибка при загрузке: ${error.message}`);
      }}
+     appearance={{
+                button: {
+                  background: '#f0b100',
+                  color: 'white',
+                  fontSize: '14px',
+                  padding: '8px 16px',
+                  borderRadius: '6px',
+                },
+              }}
    />
    
    

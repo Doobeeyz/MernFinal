@@ -10,6 +10,7 @@ import ReviewList from '../../../components/ReviewList';
 
 type MongoId = string | { $oid: string };
 type MongoDate = string | { $date: string };
+
 const getKey = (id: MongoId): string => {
   if (typeof id === 'string') return id;
   if (id && typeof id === 'object' && '$oid' in id && typeof id.$oid === 'string') return id.$oid;
