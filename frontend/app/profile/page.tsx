@@ -20,38 +20,38 @@ export default function Profile() {
 
 
   useEffect(() => {
-  const fetchUser = async () => {
-    try {
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        router.push('/login');
-        return;
-      }
-
-      const res = await axios.get('http://localhost:3001/api/user/me', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Cache-Control': 'no-cache', // <--- добавьте это!
+    const fetchUser = async () => {
+      try {
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+          router.push('/login');
+          return;
         }
-      });
 
-      // Если res.data пустой, не сбрасывайте пользователя
-      if (!res.data || Object.keys(res.data).length === 0) {
-        throw new Error('Пустой ответ');
+        const res = await axios.get('http://localhost:3001/api/user/me', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Cache-Control': 'no-cache',
+          }
+        });
+
+
+        if (!res.data || Object.keys(res.data).length === 0) {
+          throw new Error('Пустой ответ');
+        }
+
+        setUser(res.data);
+      } catch (err) {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        router.push('/login');
+      } finally {
+        setLoading(false);
       }
+    };
 
-      setUser(res.data);
-    } catch (err) {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      router.push('/login');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  fetchUser();
-}, [router]);
+    fetchUser();
+  }, [router]);
 
 
 const handleAvatarUpload = async (uploadedUrl: string) => {
@@ -62,7 +62,7 @@ const handleAvatarUpload = async (uploadedUrl: string) => {
       { avatarUrl: uploadedUrl },
       {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`, // исправлено!
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
         },
       }
     );

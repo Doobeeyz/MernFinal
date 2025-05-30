@@ -1,6 +1,7 @@
 import express from "express";
 import jwt from "jsonwebtoken";
 import Movie from "../models/Movie.js";
+
 const router = express.Router();
 // Middleware to verify JWT
 function auth(req, res, next) {
